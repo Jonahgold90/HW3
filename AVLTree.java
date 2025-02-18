@@ -1,13 +1,11 @@
 
 /*
- * *** YOUR NAME GOES HERE / YOUR SECTION NUMBER ***
+ * *** Jonah Goldberg / Section 002 ***
  *
  * This java file is a Java object implementing simple AVL Tree.
  * You are to complete the deleteElement method.
  *
  */
-
-import java.lang.Math;
 
 
 /**
@@ -361,6 +359,82 @@ class LUC_AVLTree {
          * code for each. You can also look at the method InsertElement, as it has do
          * do many of the same things as this method.
          */
+
+        if(node == null) {
+            return node;
+        }
+
+        /*If the value to be deleted is smaller than the current nodes value
+        *then the target node exists in the left subtree (RECURSIVE)
+        */
+        if(value < node.value) {
+            node.leftChild = deleteElement(value, node.leftChild);
+        }
+
+        /*If the value to be deleted is greater than the current nodes value
+        *then the target node exists in the right subtree (RECURSIVE)
+        */
+        else if(value > node.value) {
+            node.rightChild = deleteElement(value, node.rightChild);    
+        }
+        
+        //If the current nodes value = the target node value we've found the node to be deleted
+        if(value == node.value) {
+            //Check if the node has 0 children
+            if(node.leftChild == null && node.rightChild == null) {
+                //Returning null effectively deletes the leaf node
+                return null;
+            }
+            //Case if node has 1 child
+            else if(node.leftChild == null || node.rightChild == null) {
+                //If the left child isn't null we want to return it so parent is connected to the nodes left child
+                if(node.leftChild != null) {
+                    return node.leftChild;
+                } else {
+                    //The right child isn't null so we want to connect the nodes right child to the parent node
+                    return node.rightChild;
+                }
+            }
+            //Case if node has 2 children
+            else {
+                //Get the in-order successor
+                Node successor = minValueNode(node.rightChild);
+
+                //Replace the current nodes value with the value of the in-order successor (effectively deletes node with 2 children)
+                node.value = successor.value;
+
+                //Delete the duplicate successor in the right subtree
+                node.rightChild = deleteElement(successor.value, node.rightChild);
+
+                //Return the node after deletion
+                return node;
+            }
+        } 
+
+        //Update the height of the current node with the large height of left and right subtrees + 1
+        node.height = Math.max(getHeight(node.leftChild), getHeight(node.rightChild)) + 1;
+
+        //Rebalance the tree if needed
+
+        //Left left case
+        if(getBalanceFactor(node) > 1 && getBalanceFactor(node.leftChild) >= 0) {
+            return LLRotation(node);
+        } 
+
+        //Left right case
+        if(getBalanceFactor(node) > 1 && getBalanceFactor(node.leftChild) < 0) {
+            return LRRotation(node);
+        }
+
+        //Right right case
+        if(getBalanceFactor(node) < -1 && getBalanceFactor(node.rightChild) <= 0) {
+            return RRRotation(node);
+        }
+
+        //Right left case
+        if(getBalanceFactor(node) < -1 && getBalanceFactor(node.rightChild) > 0) {
+            return RLRotation(node);
+        }
 
         return node;
     }
